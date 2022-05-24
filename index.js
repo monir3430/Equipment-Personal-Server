@@ -15,6 +15,7 @@ async function run() {
     try{
       await client.connect();
       const productCollection = client.db('equipments').collection('tools');
+      const reviewCollection = client.db('equipments').collection('reviews');
 
       app.get('/tools', async(req, res)=>{
         const query = {};
@@ -23,14 +24,32 @@ async function run() {
         res.send(tools);
       })
 
-       // post data to MongoDB ------------------------------
+       // post data to MongoDB of Reviews------------------------------
 
-       app.post('/tools', async(req, res)=>{
+       app.post('/reviews', async(req, res)=>{
         console.log(req.body)
-        const addTool = req.body;
-        const result =await productCollection.insertOne(addTool)
+        const review = req.body;
+        const result =await reviewCollection.insertOne(review)
         res.send(result);
     })
+
+      // get data from mongodb of reviews-------------------
+
+    app.get('/reviews', async(req, res)=>{
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    })
+
+    // post data to mongodb of tools----------------------
+    app.post('/tools', async(req, res)=>{
+      console.log(req.body)
+      const addTool = req.body;
+      const result =await productCollection.insertOne(addTool)
+      res.send(result);
+  })
+
     }
     finally{
 
