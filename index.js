@@ -18,6 +18,7 @@ async function run() {
       const productCollection = client.db('equipments').collection('tools');
       const reviewCollection = client.db('equipments').collection('reviews');
       const orderCollection = client.db('equipments').collection('orders');
+      const profileCollection = client.db('equipments').collection('profile');
 
       app.get('/tools', async(req, res)=>{
         const query = {};
@@ -52,20 +53,52 @@ async function run() {
 
 
     // display specific product---------------
-  app.get('/tools/:id', async(req, res) =>{
-    const id = req.params.id;
-    const query = {_id: ObjectId(id)};
-    const result= await productCollection.findOne(query);
-    res.send(result);
-  })
+  // app.get('/tools/:id', async(req, res) =>{
+  //   const id = req.params.id;
+  //   const query = {_id: ObjectId(id)};
+  //   const result= await productCollection.findOne(query);
+  //   res.send(result);
+  // })
 
-    // post data to mongodb of tools----------------------
-    app.post('/tools', async(req, res)=>{
-      console.log(req.body)
-      const addTool = req.body;
-      const result =await productCollection.insertOne(addTool)
-      res.send(result);
-  })
+  //   // post data to mongodb of tools----------------------
+  //   app.post('/tools', async(req, res)=>{
+  //     console.log(req.body)
+  //     const addTool = req.body;
+  //     const result =await productCollection.insertOne(addTool)
+  //     res.send(result);
+  // })
+
+  // // put data in mdb of user profile-----------------------
+ 
+  // app.put('/profile/:id', async(req, res)=>{
+  //   const id= req.params.id;
+  //   const updateProfile = req.body;
+  //   const filter = {_id: ObjectId(id)};
+  //   const options = { upsert: true };
+  //   const updateProfileDoc = {
+  //       $set: {
+  //          name: updateProfile.name,
+  //          email: updateProfile.email,
+  //          education: updateProfile.education,
+  //          address: updateProfile.address,
+  //          mobile: updateProfile.mobile,
+  //          linkedIn: updateProfile.linkedIn,
+           
+           
+  //       }
+  //   };
+  //   const result = await profileCollection.updateOne(filter, updateProfileDoc, options );
+  //   res.send(result);
+
+
+  //   })
+
+  app.post('/profile', async(req, res)=>{
+    console.log(req.body)
+    const profile = req.body;
+    const result =await profileCollection.insertOne(profile)
+    res.send(result);
+})
 
 
   
