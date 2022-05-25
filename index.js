@@ -1,5 +1,6 @@
 const express = require('express')
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 require('dotenv').config()
 const app = express()
@@ -16,6 +17,7 @@ async function run() {
       await client.connect();
       const productCollection = client.db('equipments').collection('tools');
       const reviewCollection = client.db('equipments').collection('reviews');
+      const orderCollection = client.db('equipments').collection('orders');
 
       app.get('/tools', async(req, res)=>{
         const query = {};
@@ -32,6 +34,12 @@ async function run() {
         const result =await reviewCollection.insertOne(review)
         res.send(result);
     })
+       app.post('/orders', async(req, res)=>{
+        console.log(req.body)
+        const order = req.body;
+        const result =await orderCollection.insertOne(order)
+        res.send(result);
+    })
 
       // get data from mongodb of reviews-------------------
 
@@ -42,6 +50,15 @@ async function run() {
       res.send(reviews);
     })
 
+
+    // display specific product---------------
+  app.get('/tools/:id', async(req, res) =>{
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)};
+    const result= await productCollection.findOne(query);
+    res.send(result);
+  })
+
     // post data to mongodb of tools----------------------
     app.post('/tools', async(req, res)=>{
       console.log(req.body)
@@ -49,6 +66,9 @@ async function run() {
       const result =await productCollection.insertOne(addTool)
       res.send(result);
   })
+
+
+  
 
     }
     finally{
