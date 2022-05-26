@@ -51,14 +51,22 @@ async function run() {
       res.send(reviews);
     })
 
+    // all order load for my order/Admin see all order client side-------------
 
-    // display specific product---------------
-  // app.get('/tools/:id', async(req, res) =>{
-  //   const id = req.params.id;
-  //   const query = {_id: ObjectId(id)};
-  //   const result= await productCollection.findOne(query);
-  //   res.send(result);
-  // })
+    app.get('/orders', async(req, res)=>{
+      const query = {};
+      const cursor = orderCollection.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    })
+
+//display specific product---------------
+  app.get('/tools/:id', async(req, res) =>{
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)};
+    const result= await productCollection.findOne(query);
+    res.send(result);
+  })
 
   //   // post data to mongodb of tools----------------------
   //   app.post('/tools', async(req, res)=>{
@@ -93,12 +101,25 @@ async function run() {
 
   //   })
 
-  app.post('/profile', async(req, res)=>{
-    console.log(req.body)
-    const profile = req.body;
-    const result =await profileCollection.insertOne(profile)
-    res.send(result);
-})
+//   app.post('/profile', async(req, res)=>{
+//     console.log(req.body)
+//     const profile = req.body;
+//     const result =await profileCollection.insertOne(profile)
+//     res.send(result);
+// })
+
+
+app.put('/profile/:email', async (req, res) => {
+  const email = req.params.email;
+  const profile = req.body;
+  const filter = { email: email };
+  const options = { upsert: true };
+  const updateProfileDoc = {
+    $set: profile,
+  };
+  const result = await profileCollection .updateOne(filter, updateProfileDoc , options);
+  res.send({result});
+});
 
 
   
