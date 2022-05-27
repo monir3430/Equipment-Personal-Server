@@ -2,6 +2,7 @@ const express = require('express')
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000
@@ -19,6 +20,7 @@ async function run() {
       const reviewCollection = client.db('equipments').collection('reviews');
       const orderCollection = client.db('equipments').collection('orders');
       const profileCollection = client.db('equipments').collection('profile');
+      const userCollection = client.db('equipments').collection('users');
 
       app.get('/tools', async(req, res)=>{
         const query = {};
@@ -53,7 +55,7 @@ async function run() {
 
     // all order load for my order/Admin see all order client side-------------
 
-    app.get('/orders', async(req, res)=>{
+    app.get('/orders', async(req, res)=>{ 
       const query = {};
       const cursor = orderCollection.find(query);
       const orders = await cursor.toArray();
@@ -68,13 +70,43 @@ async function run() {
     res.send(result);
   })
 
-  //   // post data to mongodb of tools----------------------
-  //   app.post('/tools', async(req, res)=>{
-  //     console.log(req.body)
-  //     const addTool = req.body;
-  //     const result =await productCollection.insertOne(addTool)
-  //     res.send(result);
-  // })
+    // post data to mongodb of tools by admin user----------------------
+    app.post('/tools', async(req, res)=>{
+      console.log(req.body)
+      const addTool = req.body;
+      const result =await productCollection.insertOne(addTool)
+      res.send(result);
+  })
+
+// user email to data base-------------------------------------------
+  app.put('/user/:email', async (req, res) => {
+    const email = req.params.email;
+    const user = req.body;
+    const filter = { email: email };
+    const options = { upsert: true };
+    const updateUserDoc = {
+      $set: user,
+    };
+    const result = await userCollection.updateOne(filter, updateUserDoc , options);
+    const token = jwt.sign({ email: email}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    res.send({result,token});
+    
+  });
+
+  // user Admin field---------------------------------------------------
+  app.put('/user/admin/:email', async (req, res) => {
+    const email = req.params.email; 
+    const filter = { email: email };
+    const updateUserDoc = {
+      $set: {role:'admin'},
+    };
+    const result = await userCollection.updateOne(filter, updateUserDoc);
+    res.send(result);
+    
+  });
+
+
+  //--------------------------------------------------------------------
 
   // // put data in mdb of user profile-----------------------
  
@@ -101,12 +133,6 @@ async function run() {
 
   //   })
 
-//   app.post('/profile', async(req, res)=>{
-//     console.log(req.body)
-//     const profile = req.body;
-//     const result =await profileCollection.insertOne(profile)
-//     res.send(result);
-// })
 
 
 app.put('/profile/:email', async (req, res) => {
@@ -121,6 +147,16 @@ app.put('/profile/:email', async (req, res) => {
   res.send({result});
 });
 
+
+// Load all users for admin side------------------------------
+
+
+app.get('/users', async(req, res)=>{ 
+  const query = {};
+  const cursor = userCollection.find(query);
+  const user = await cursor.toArray();
+  res.send(user);
+})
 
   
 
