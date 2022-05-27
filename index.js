@@ -29,6 +29,17 @@ async function run() {
         res.send(tools);
       })
 
+
+      //for admin role--------------------------------------------------
+      app.get('/admin/:email', async (req, res) => {
+        const email = req.params.email;
+        const user = await userCollection.findOne({ email: email });
+        const isAdmin = user.role === 'admin';
+        res.send({ admin: isAdmin })
+      })
+
+      //-------------------------------------------------------------
+
        // post data to MongoDB of Reviews------------------------------
 
        app.post('/reviews', async(req, res)=>{
@@ -108,33 +119,6 @@ async function run() {
 
   //--------------------------------------------------------------------
 
-  // // put data in mdb of user profile-----------------------
- 
-  // app.put('/profile/:id', async(req, res)=>{
-  //   const id= req.params.id;
-  //   const updateProfile = req.body;
-  //   const filter = {_id: ObjectId(id)};
-  //   const options = { upsert: true };
-  //   const updateProfileDoc = {
-  //       $set: {
-  //          name: updateProfile.name,
-  //          email: updateProfile.email,
-  //          education: updateProfile.education,
-  //          address: updateProfile.address,
-  //          mobile: updateProfile.mobile,
-  //          linkedIn: updateProfile.linkedIn,
-           
-           
-  //       }
-  //   };
-  //   const result = await profileCollection.updateOne(filter, updateProfileDoc, options );
-  //   res.send(result);
-
-
-  //   })
-
-
-
 app.put('/profile/:email', async (req, res) => {
   const email = req.params.email;
   const profile = req.body;
@@ -158,6 +142,15 @@ app.get('/users', async(req, res)=>{
   res.send(user);
 })
 
+// Data delete from mongodb by admin user--------------------------
+app.delete('/tools/:id', async(req, res)=>{
+  const id = req.params.id;
+  const query = {_id: ObjectId(id)};
+  const result  = await productCollection.deleteOne(query);
+  res.send(result);
+})
+
+//-------------------------------------------------------------------
   
 
     }
