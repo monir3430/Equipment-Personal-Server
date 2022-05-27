@@ -4,6 +4,7 @@ const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const app = express()
 const port = process.env.PORT || 5000
 
@@ -21,6 +22,7 @@ async function run() {
       const orderCollection = client.db('equipments').collection('orders');
       const profileCollection = client.db('equipments').collection('profile');
       const userCollection = client.db('equipments').collection('users');
+      const paymentCollection = client.db('equipments').collection('payment');
 
       app.get('/tools', async(req, res)=>{
         const query = {};
@@ -72,6 +74,19 @@ async function run() {
       const orders = await cursor.toArray();
       res.send(orders);
     })
+
+    //--------------------------------------------------------------------------
+
+    // get data from mongodb of order for payment by id-----------------------
+
+    app.get('/orders/:id', async(req, res) =>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)};
+      const orders = await orderCollection.findOne(query);
+      res.send(orders);
+    })
+
+    //--------------------------------------------------------------------------
 
 //display specific product---------------
   app.get('/tools/:id', async(req, res) =>{
@@ -152,6 +167,37 @@ app.delete('/tools/:id', async(req, res)=>{
 
 //-------------------------------------------------------------------
   
+
+// for Payment------------------------------------------------------
+app.post('/create-payment-intent', async(req, res) =>{
+  const order = req.body;
+  const totalCost = order.totalCost;
+  const amount = totalCost*100;
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount : amount,
+    currency: 'usd',
+    payment_method_types:['card']
+  });
+  res.send({clientSecret: paymentIntent.client_secret})
+});
+
+//-------------------------------------------------------------------
+//Payment success PATCH----------------------------------------------
+app.patch('/orders/:id', async(req, res) =>{
+  const id  = req.params.id;
+  const payment = req.body;
+  const filter = {_id: ObjectId(id)};
+  const updatedDoc = {
+    $set: {
+      paid: true,
+      transactionId: payment.transactionId
+    }
+  }
+
+  const result = await paymentCollection.insertOne(payment);
+  const updatedOrders = await orderCollection.updateOne(filter, updatedDoc);
+  res.send(updatedOrders);
+})
 
     }
     finally{
