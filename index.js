@@ -209,7 +209,7 @@ app.patch('/orders/:id', async(req, res) =>{
   const filter = {_id: ObjectId(id)};
   const updatedDoc = {
     $set: {
-      paid: true,
+      paid: true, 
       transactionId: payment.transactionId
     }
   }
