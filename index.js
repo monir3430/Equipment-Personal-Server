@@ -164,8 +164,28 @@ app.delete('/tools/:id', async(req, res)=>{
   const result  = await productCollection.deleteOne(query);
   res.send(result);
 })
+//------------------------------------------------------------------
 
-//-------------------------------------------------------------------
+
+// data delete from My Order by user--------------------------------
+app.delete('/orders/:id', async(req, res)=>{
+  const id = req.params.id;
+  const query = {_id: ObjectId(id)};
+  const result  = await orderCollection.deleteOne(query);
+  res.send(result);
+})
+
+// user delete from mongodb-----------------------------------------
+
+app.delete('/users/:id', async(req, res)=>{
+  const id = req.params.id;
+  const query = {_id: ObjectId(id)};
+  const result  = await userCollection.deleteOne(query);
+  res.send(result);
+})
+
+ //-----------------------------------------------------------------
+
   
 
 // for Payment------------------------------------------------------
