@@ -40,8 +40,6 @@ async function run() {
         res.send({ admin: isAdmin })
       })
 
-      //-------------------------------------------------------------
-
        // post data to MongoDB of Reviews------------------------------
 
        app.post('/reviews', async(req, res)=>{
@@ -75,7 +73,6 @@ async function run() {
       res.send(orders);
     })
 
-    //--------------------------------------------------------------------------
 
     // get data from mongodb of order for payment by id-----------------------
 
@@ -86,7 +83,6 @@ async function run() {
       res.send(orders);
     })
 
-    //--------------------------------------------------------------------------
 
 //display specific product---------------
   app.get('/tools/:id', async(req, res) =>{
@@ -132,8 +128,6 @@ async function run() {
   });
 
 
-  //--------------------------------------------------------------------
-
 app.put('/profile/:email', async (req, res) => {
   const email = req.params.email;
   const profile = req.body;
@@ -164,8 +158,6 @@ app.delete('/tools/:id', async(req, res)=>{
   const result  = await productCollection.deleteOne(query);
   res.send(result);
 })
-//------------------------------------------------------------------
-
 
 // data delete from My Order by user--------------------------------
 app.delete('/orders/:id', async(req, res)=>{
@@ -184,9 +176,6 @@ app.delete('/users/:id', async(req, res)=>{
   res.send(result);
 })
 
- //-----------------------------------------------------------------
-
-  
 
 // for Payment------------------------------------------------------
 app.post('/create-payment-intent', async(req, res) =>{
@@ -201,7 +190,7 @@ app.post('/create-payment-intent', async(req, res) =>{
   res.send({clientSecret: paymentIntent.client_secret})
 });
 
-//-------------------------------------------------------------------
+
 //Payment success PATCH----------------------------------------------
 app.patch('/orders/:id', async(req, res) =>{
   const id  = req.params.id;
